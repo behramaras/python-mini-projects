@@ -1,0 +1,3 @@
+[submodule "book-registration-automation"]
+	path = book-registration-automation
+	url = https://github.com/behramaras/book-registration-automation.git
