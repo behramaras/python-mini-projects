@@ -10,3 +10,63 @@ from sklearn.preprocessing import label_binarize
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
+warnings.filterwarnings('ignore')
+
+# ==============================================
+# VERİ YÜKLEME VE TEMİZLEME
+# ==============================================
+
+# Excel dosyasından veriyi yüklüyoruz
+df = pd.read_excel("dataset for mendeley 181220.xlsx")
+
+# Sütun isimlerindeki gereksiz boşlukları ve tırnak işaretlerini temizliyoruz
+df.columns = df.columns.str.strip().str.replace("'", "", regex=False).str.replace('"', "", regex=False)
+
+# Analizde kullanacağımız sütunları belirliyoruz
+required_columns = [
+    'Gender',
+    'Age as of Academic Year 17/18',
+    'Previous Curriculum (17/18)2',
+    'Math20-1 ', 'Science20-1 ', 'English20-1 ',
+    'Math20-2 ', 'Science20-2 ', 'English20-2 ',
+    'Math20-3 ', 'Science20-3 ', 'English20-3 '
+]
+
+# Sadece gerekli sütunları alıp, eksik değerleri çıkarıyoruz
+df = df[required_columns].dropna()
+
+# Sınav sütunlarını belirliyoruz (Math, Science, English içeren sütunlar)
+exam_cols = [col for col in df.columns if "Math" in col or "Science" in col or "English" in col]
+
+# Tüm sınavların ortalamasını hesaplıyoruz
+df['ExamAverage'] = df[exam_cols].mean(axis=1)
+warnings.filterwarnings('ignore')
+
+# ==============================================
+# VERİ YÜKLEME VE TEMİZLEME
+# ==============================================
+
+# Excel dosyasından veriyi yüklüyoruz
+df = pd.read_excel("dataset for mendeley 181220.xlsx")
+
+# Sütun isimlerindeki gereksiz boşlukları ve tırnak işaretlerini temizliyoruz
+df.columns = df.columns.str.strip().str.replace("'", "", regex=False).str.replace('"', "", regex=False)
+
+# Analizde kullanacağımız sütunları belirliyoruz
+required_columns = [
+    'Gender',
+    'Age as of Academic Year 17/18',
+    'Previous Curriculum (17/18)2',
+    'Math20-1 ', 'Science20-1 ', 'English20-1 ',
+    'Math20-2 ', 'Science20-2 ', 'English20-2 ',
+    'Math20-3 ', 'Science20-3 ', 'English20-3 '
+]
+
+# Sadece gerekli sütunları alıp, eksik değerleri çıkarıyoruz
+df = df[required_columns].dropna()
+
+# Sınav sütunlarını belirliyoruz (Math, Science, English içeren sütunlar)
+exam_cols = [col for col in df.columns if "Math" in col or "Science" in col or "English" in col]
+
+# Tüm sınavların ortalamasını hesaplıyoruz
+df['ExamAverage'] = df[exam_cols].mean(axis=1)
