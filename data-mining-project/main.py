@@ -70,3 +70,21 @@ exam_cols = [col for col in df.columns if "Math" in col or "Science" in col or "
 
 # Tüm sınavların ortalamasını hesaplıyoruz
 df['ExamAverage'] = df[exam_cols].mean(axis=1)
+
+# Yerleştirme seviyesini belirleyen fonksiyon tanımlıyoruz
+def get_placement_level(avg):
+    """
+    Sınav ortalamasına göre yerleştirme seviyesini belirler
+    85+ : High (Yüksek)
+    75-84: Medium (Orta)  
+    75 altı: Low (Düşük)
+    """
+    if avg >= 85:
+        return 'High'
+    elif avg >= 75:
+        return 'Medium'
+    else:
+        return 'Low'
+
+# Her öğrenci için yerleştirme seviyesini hesaplıyoruz
+df['PlacementLevel'] = df['ExamAverage'].apply(get_placement_level)
