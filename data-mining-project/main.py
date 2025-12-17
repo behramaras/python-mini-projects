@@ -88,3 +88,45 @@ def get_placement_level(avg):
 
 # Her öğrenci için yerleştirme seviyesini hesaplıyoruz
 df['PlacementLevel'] = df['ExamAverage'].apply(get_placement_level)
+
+# ==============================================
+# VERİ MADENCİLİĞİ GÖRSELLEŞTİRME (EDA)
+# ==============================================
+
+# Yerleştirme seviyelerinin dağılımını görselleştiriyoruz
+plt.figure(figsize=(6, 4))
+sns.countplot(data=df, x='PlacementLevel', order=['Low', 'Medium', 'High'], palette='Set2')
+plt.title("PlacementLevel Sınıf Dağılımı")
+plt.tight_layout()
+plt.show()
+
+# Sınav ortalamalarının histogramını çiziyoruz
+plt.figure(figsize=(6, 4))
+sns.histplot(df['ExamAverage'], kde=True, bins=20, color='skyblue')
+plt.title("ExamAverage Dağılımı")
+plt.tight_layout()
+plt.show()
+
+# Cinsiyete göre sınav ortalamalarını karşılaştırıyoruz
+plt.figure(figsize=(6, 4))
+sns.boxplot(data=df, x='Gender', y='ExamAverage', palette='pastel')
+plt.title("Cinsiyete Göre Ortalama Notlar")
+plt.tight_layout()
+plt.show()
+
+# Önceki müfredata göre sınav ortalamalarını karşılaştırıyoruz
+plt.figure(figsize=(8, 4))
+sns.boxplot(data=df, x='Previous Curriculum (17/18)2', y='ExamAverage', palette='muted')
+plt.title("Müfredata Göre Ortalama Notlar")
+plt.xticks(rotation=45)
+plt.tight_layout()
+plt.show()
+
+# Sayısal değişkenler arasındaki korelasyonu inceliyoruz
+plt.figure(figsize=(10, 8))
+corr = df.select_dtypes(include='number').corr()
+sns.heatmap(corr, annot=True, fmt='.2f', cmap='coolwarm', square=True)
+plt.title("Sayısal Özellikler Arası Korelasyon Matrisi")
+plt.tight_layout()
+plt.show()
+
