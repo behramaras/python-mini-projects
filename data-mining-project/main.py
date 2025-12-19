@@ -148,3 +148,35 @@ X_val, X_test, y_val, y_test = train_test_split(X_temp, y_temp, test_size=2/3, r
 # Sınıf isimlerini alıyoruz (High, Low, Medium)
 class_names = np.unique(y)
 
+# ===============================
+# EN İYİ RFC PARAMETRELERİNİ BUL (GRID SEARCH)
+# ===============================
+
+# Random Forest için deneyeceğimiz parametre kombinasyonlarını belirliyoruz
+param_grid = {
+    'n_estimators': [50, 100, 200],        # Ağaç sayısı
+    'max_depth': [5, 10, 15],              # Maksimum derinlik
+    'min_samples_split': [2, 5],           # Dallanma için minimum örnek sayısı
+    'min_samples_leaf': [1, 2],            # Yaprakta minimum örnek sayısı
+    'max_features': ['sqrt', 'log2'],       # Her dallanmada kullanılacak özellik sayısı
+    'criterion': ['gini', 'entropy']       # Dallanma kriteri
+}
+
+# Grid Search ile en iyi parametreleri buluyoruz
+print("Grid Search başlıyor... Bu işlem biraz zaman alabilir.")
+grid_search = GridSearchCV(
+    estimator=RandomForestClassifier(bootstrap=True, random_state=42, n_jobs=-1),
+    param_grid=param_grid,
+    scoring='f1_macro',  # F1 skoruna göre değerlendirme yapıyoruz
+    cv=3,               # 3-fold cross validation
+    verbose=2,          # İlerleme durumunu göster
+    n_jobs=-1          # Tüm işlemci çekirdeklerini kullan
+)
+
+# En iyi parametreleri bulmak için Grid Search çalıştırıyoruz
+grid_search.fit(X_train, y_train)
+
+print("\nEn iyi parametreler (GridSearchCV ile):")
+best_params = grid_search.best_params_
+print(best_params)
+
