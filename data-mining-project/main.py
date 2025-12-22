@@ -180,3 +180,103 @@ print("\nEn iyi parametreler (GridSearchCV ile):")
 best_params = grid_search.best_params_
 print(best_params)
 
+# ===============================
+# EN İYİ MODEL İLE EĞİTİM VE TEST
+# ===============================
+
+# En iyi parametrelerle bulunan modeli alıyoruz
+best_model = grid_search.best_estimator_
+
+# Modeli eğitim verisiyle eğitiyoruz
+print("En iyi model eğitiliyor...")
+best_model.fit(X_train, y_train)
+
+# Test verisi üzerinde tahmin yapıyoruz
+y_pred = best_model.predict(X_test)              # Sınıf tahminleri
+y_prob = best_model.predict_proba(X_test)        # Olasılık tahminleri
+
+# Test verisi için binary format (ROC eğrisi için gerekli)
+y_test_bin = label_binarize(y_test, classes=class_names)
+
+# Eğitim verisi üzerinde de tahmin yapıyoruz (overfitting kontrolü için)
+y_train_pred = best_model.predict(X_train)
+y_train_prob = best_model.predict_proba(X_train)
+y_train_bin = label_binarize(y_train, classes=class_names)
+
+# Temel performans metriklerini hesaplıyoruz
+acc = accuracy_score(y_test, y_pred)                              # Doğruluk
+prec = precision_score(y_test, y_pred, average='macro')           # Kesinlik
+recall = recall_score(y_test, y_pred, average='macro')            # Duyarlılık (Sensitivity)
+f1 = f1_score(y_test, y_pred, average='macro')                    # F1 Skoru
+auc = roc_auc_score(y_test_bin, y_prob, average='macro', multi_class='ovr')  # AUC
+
+# Specificity (Özgüllük) hesaplıyoruz - her sınıf için ayrı ayrı
+specificities = []
+for label in class_names:
+    # Her sınıf için binary classification problemi haline getiriyoruz
+    binary_y_test = (y_test == label).astype(int)
+    binary_y_pred = (y_pred == label).astype(int)
+    
+    # Confusion matrix elemanlarını alıyoruz
+    tn, fp, fn, tp = confusion_matrix(binary_y_test, binary_y_pred).ravel()
+    
+    # Specificity = TN / (TN + FP)
+    specificity = tn / (tn + fp) if (tn + fp) != 0 else 0
+    specificities.append(specificity)
+
+# Ortalama specificity hesaplıyoruz
+specificity_macro = np.mean(specificities)
+
+# Sonuçları ekrana yazdırıyoruz
+print("\nEn iyi model test sonuçları:")
+print(f"Accuracy: {acc:.4f}")
+print(f"Precision: {prec:.4f}")
+print(f"Recall (Sensitivity): {recall:.4f}")
+print(f"F1-Score: {f1:.4f}")
+print(f"AUC: {auc:.4f}")
+print(f"Specificity: {specificity_macro:.4f}")
+
+# Confusion Matrix (Karışıklık Matrisi) görselleştiriyoruz
+cm = confusion_matrix(y_test, y_pred, labels=class_names)
+sns.heatmap(cm, annot=True, fmt='d', xticklabels=class_names, yticklabels=class_names, cmap='Greens')
+plt.title("En İyi Model - Confusion Matrix")
+plt.xlabel("Predicted")
+plt.ylabel("Actual")
+plt.tight_layout()
+plt.show()
+
+# ROC Eğrilerini çiziyoruz (hem eğitim hem de test için)
+fig, axs = plt.subplots(1, 2, figsize=(14, 5))
+
+# Her sınıf için ROC eğrisini çiziyoruz
+for i, class_label in enumerate(class_names):
+    # Test verisi için ROC eğrisi
+    fpr_test, tpr_test, _ = roc_curve(y_test_bin[:, i], y_prob[:, i])
+    # Eğitim verisi için ROC eğrisi (overfitting kontrolü)
+    fpr_train, tpr_train, _ = roc_curve(y_train_bin[:, i], y_train_prob[:, i])
+    
+    # Eğitim ROC eğrisini çiziyoruz
+    axs[0].plot(fpr_train, tpr_train, 
+               label=f'{class_label} (Train AUC={roc_auc_score(y_train_bin[:, i], y_train_prob[:, i]):.2f})')
+    
+    # Test ROC eğrisini çiziyoruz
+    axs[1].plot(fpr_test, tpr_test, 
+               label=f'{class_label} (Test AUC={roc_auc_score(y_test_bin[:, i], y_prob[:, i]):.2f})')
+
+# Rastgele tahmin çizgisini ekliyoruz (referans için)
+axs[0].plot([0, 1], [0, 1], 'k--')
+axs[1].plot([0, 1], [0, 1], 'k--')
+
+# Grafik başlıklarını ve etiketlerini ayarlıyoruz
+axs[0].set_title("Train ROC Curve (Best RFC)")
+axs[1].set_title("Test ROC Curve (Best RFC)")
+
+for ax in axs:
+    ax.set_xlabel("False Positive Rate")
+    ax.set_ylabel("True Positive Rate")
+    ax.legend()
+
+plt.tight_layout()
+plt.show()
+
+
