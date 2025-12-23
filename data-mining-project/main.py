@@ -279,4 +279,32 @@ for ax in axs:
 plt.tight_layout()
 plt.show()
 
+# ==============================================
+# PERFORMANS METRİKLERİ GÖRSELLEŞTİRME
+# ==============================================
+
+# Tüm performans metriklerini bir sözlükte topluyoruz
+metrics = {
+    "Accuracy": acc,
+    "Precision": prec,
+    "Recall (Sensitivity)": recall,
+    "F1-Score": f1,
+    "AUC": auc,
+    "Specificity": specificity_macro
+}
+
+# Performans metriklerini bar grafik olarak görselleştiriyoruz
+plt.figure(figsize=(8, 5))
+sns.barplot(x=list(metrics.keys()), y=list(metrics.values()), palette='viridis')
+plt.ylim(0, 1.05)  # Y ekseni sınırlarını 0-1 arası yapıyoruz
+plt.ylabel("Skor")
+plt.title("Model Performans Metrikleri (Test Verisi)")
+
+# Her çubuk üzerine değeri yazıyoruz
+for i, v in enumerate(metrics.values()):
+    plt.text(i, v + 0.02, f"{v:.2f}", ha='center', va='bottom', fontweight='bold')
+
+plt.xticks(rotation=30)
+plt.tight_layout()
+plt.show()
 
