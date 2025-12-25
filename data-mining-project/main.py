@@ -308,3 +308,31 @@ plt.xticks(rotation=30)
 plt.tight_layout()
 plt.show()
 
+# ==============================================
+# ÖZNİTELİK ÖNEMİ GÖRSELLEŞTİRME (FEATURE IMPORTANCE)
+# ==============================================
+
+# Random Forest modelinden öznitelik önem skorlarını alıyoruz
+importances = best_model.feature_importances_
+feature_names = X.columns
+
+# Öznitelik önem skorlarını DataFrame'e çevirip sıralıyoruz
+feature_importance_df = pd.DataFrame({
+    'Feature': feature_names,
+    'Importance': importances
+}).sort_values(by='Importance', ascending=False)
+
+# En önemli öznitelikleri görselleştiriyoruz
+plt.figure(figsize=(10, 6))
+sns.barplot(data=feature_importance_df.head(50), x='Importance', y='Feature', palette='mako')
+plt.title("Öznitelik Önem Sıralamaları (Random Forest)")
+plt.xlabel("Önem Skoru")
+plt.ylabel("Öznitelik")
+plt.tight_layout()
+plt.show()
+
+print("\nAnaliz tamamlandı! Model başarıyla eğitildi ve değerlendirildi.")
+print(f"En yüksek performans metrikleri:")
+print(f"- En yüksek skor: {max(metrics.values()):.4f}")
+print(f"- Bu skorun ait olduğu metrik: {max(metrics, key=metrics.get)}")
+
