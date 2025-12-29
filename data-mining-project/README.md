@@ -5,7 +5,7 @@ The workflow includes **data preprocessing, exploratory data analysis (EDA), mod
 
 ---
 
-## 📂 Dataset
+## Dataset
 
 - **File name:** `dataset.xlsx`
 - **Format:** Excel
@@ -23,7 +23,7 @@ The workflow includes **data preprocessing, exploratory data analysis (EDA), mod
 
 ---
 
-## ⚙️ Project Workflow
+## Project Workflow
 
 ### 1. Data Loading & Cleaning
 - Load data from Excel
@@ -68,7 +68,7 @@ The following metrics are calculated on the test set:
 
 ---
 
-## 📊 Output Visualizations
+## Output Visualizations
 
 - Placement level class distribution
 - Exam score histograms
@@ -80,7 +80,7 @@ The following metrics are calculated on the test set:
 
 ---
 
-## 🧠 Technologies Used
+## Technologies Used
 
 - Python  
 - Pandas  
@@ -91,7 +91,7 @@ The following metrics are calculated on the test set:
 
 ---
 
-## ▶️ How to Run
+## How to Run
 
 1. Place `dataset.xlsx` in the project directory
 2. Install required libraries:
