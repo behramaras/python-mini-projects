@@ -74,3 +74,110 @@ class LicensePlateSystem:
 
         cv2.waitKey(0)
         cv2.destroyAllWindows()
+        
+     def process_plate(self, plate_number):
+        """Check if plate exists and log entry/exit"""
+
+        query = "SELECT * FROM Registered_Vehicles WHERE Plate = ?"
+        self.cursor.execute(query, (plate_number,))
+        result = self.cursor.fetchall()
+
+        if result:
+            print("ACCESS GRANTED - Gate opening")
+
+            query = "SELECT * FROM Vehicle_Log WHERE Plate = ?"
+            self.cursor.execute(query, (plate_number,))
+            history = self.cursor.fetchall()
+
+            now = datetime.datetime.now()
+            timestamp = now.strftime('%d %B %Y %H:%M:%S')
+
+            if history and history[-1][1] == 'EXIT':
+                self.cursor.execute(
+                    "INSERT INTO Vehicle_Log VALUES (?, ?, ?, ?)",
+                    (plate_number, 'ENTRY', timestamp, '')
+                )
+            else:
+                self.cursor.execute(
+                    "INSERT INTO Vehicle_Log VALUES (?, ?, ?, ?)",
+                    (plate_number, 'EXIT', '', timestamp)
+                )
+
+            self.database.commit()
+            print("Log saved successfully.")
+
+        else:
+            print("ACCESS DENIED - Unauthorized vehicle")
+
+    def main_menu(self):
+        print("\n===== LICENSE PLATE RECOGNITION SYSTEM =====\n")
+        print("1) Registration Management")
+        print("2) Run Plate Recognition")
+        print("3) Vehicle Logs")
+        print("4) Exit")
+
+        choice = input("\nSelect an option: ")
+
+        if choice == "1":
+            self.registration_menu()
+        elif choice == "2":
+            self.recognize_plate()
+        elif choice == "3":
+            self.show_logs()
+        elif choice == "4":
+            self.exit_system()
+        else:
+            print("Invalid selection.")
+
+    def registration_menu(self):
+        print("\n--- REGISTRATION MENU ---")
+        print("1) Add Vehicle")
+        print("2) View Vehicles")
+        print("3) Back")
+
+        choice = input("Select: ")
+
+        if choice == "1":
+            self.add_vehicle()
+        elif choice == "2":
+            self.view_vehicles()
+        else:
+            self.main_menu()
+
+    def add_vehicle(self):
+        owner = input("Owner Name: ")
+        plate = input("Plate Number: ")
+
+        self.cursor.execute(
+            "INSERT INTO Registered_Vehicles VALUES (?, ?)",
+            (owner, plate)
+        )
+        self.database.commit()
+        print("Vehicle registered successfully.")
+
+    def view_vehicles(self):
+        self.cursor.execute("SELECT * FROM Registered_Vehicles")
+        vehicles = self.cursor.fetchall()
+
+        print("\nRegistered Vehicles:")
+        for v in vehicles:
+            print(v)
+
+    def show_logs(self):
+        self.cursor.execute("SELECT * FROM Vehicle_Log")
+        logs = self.cursor.fetchall()
+
+        print("\nVehicle Logs:")
+        for log in logs:
+            print(log)
+
+    def exit_system(self):
+        print("Exiting system...")
+        self.database.close()
+        self.running = False
+
+
+system = LicensePlateSystem("License Plate System")
+
+while system.running:
+    system.main_menu()
